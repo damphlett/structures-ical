@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Europe/Berlin');
+
 require_once 'PHPUnit/Framework.php';
 
 require_once '../src/Structures/Ical.php';
@@ -27,8 +29,8 @@ class IcalTest extends PHPUnit_Framework_TestCase
     function testGettingTheEventsReturnsCorrectNumberOfEvents()
     {
         $this->ical->parseFile('./basic.ics');
-        $this->assertTrue(is_array($this->ical->getEventList()));
-        $this->assertEquals(11, count($this->ical->getEventList()));
+        $this->assertTrue(is_array($this->ical->getEvents()));
+        $this->assertEquals(11, count($this->ical->getEvents()));
         $this->assertEquals(11, $this->ical->getEventCount());
     }
 

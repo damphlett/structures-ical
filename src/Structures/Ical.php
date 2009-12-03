@@ -6,9 +6,9 @@
  * PHP Version 5
  *
  * <code>
- * $ical = new ical();
- * $ical->parse('./calendar.ics');
- * $ical->getAllData();
+ * $gateway = new Structures_IcalGateway();
+ * $ical = $gateway->getFromUri($uri);
+ * print_r($ical->getAllData());
  * </code>
  *
  * @package Structures_ICal
@@ -81,7 +81,7 @@ class Structures_Ical
      */
     function getEventCount()
     {
-        return count($this->getEventList());
+        return count($this->getEvents());
     }
 
     /**
@@ -101,6 +101,11 @@ class Structures_Ical
 
     }
 
+    function getTimeZone()
+    {
+        return $this->cal['VCALENDAR']['X-WR-TIMEZONE'];
+    }
+
     function parseUrl($url)
     {
         require_once 'HTTP/Request.php';
@@ -112,13 +117,19 @@ class Structures_Ical
         return $this->parse($url);
     }
 
+    function parseContent($content)
+    {
+        $this->file_text = $content;
+        return $this->parse();
+    }
+
     /**
      * Prekladac kalendare
      *
      * @param unknown_type $uri
      * @return unknown
      */
-    function parse($uri)
+    protected function parse($uri = null)
     {
         // read FILE text
         // $this->file_text = $this->readFile($uri);
@@ -172,6 +183,7 @@ class Structures_Ical
                 }
             }
         }
+
         return $this->cal;
     }
 
@@ -192,10 +204,27 @@ class Structures_Ical
             }
         }
 
-        if (($key == "DTSTAMP") or ($key == "LAST-MODIFIED") or ($key == "CREATED")) $value = $this->icalDateToUnix($value);
-        if ($key == "RRULE" ) $value = $this->icalRrule($value);
+        if (($key == "DTSTAMP") or ($key == "LAST-MODIFIED") or ($key == "CREATED")) {
+            $value = $this->icalDateToUnix($value);
+        }
+        if ($key == "RRULE") {
+            $value = $this->icalRrule($value);
+        }
 
-        if (stristr($key,"DTSTART") or stristr($key,"DTEND")) list($key,$value) = $this->icalDtDate($key,$value);
+        if ($key == "LOCATION") {
+            $value = $data = str_replace('\\,', ',', $value);
+            $value = $data = str_replace('\\;', ';', $value);
+        }
+
+        if ($key == "DESCRIPTION") {
+            $value = $data = str_replace('\\,', ',', $value);
+            $value = $data = str_replace('\\;', ';', $value);
+            $value = $data = str_replace('\\n', "\n", $value);
+        }
+
+        if (stristr($key,"DTSTART") or stristr($key,"DTEND")) {
+            list($key,$value) = $this->icalDtDate($key,$value);
+        }
 
         switch ($type) {
             case "VTODO":
@@ -254,17 +283,7 @@ class Structures_Ical
      */
     private function icalDateToUnix($ical_date)
     {
-        $ical_date = str_replace('T', '', $ical_date);
-        $ical_date = str_replace('Z', '', $ical_date);
-
-        // TIME LIMITED EVENT
-        ereg('([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{0,2})([0-9]{0,2})([0-9]{0,2})', $ical_date, $date);
-
-        // UNIX timestamps can't deal with pre 1970 dates
-        if ($date[1] <= 1970) {
-            $date[1] = 1971;
-        }
-        return  mktime($date[4], $date[5], $date[6], $date[2],$date[3], $date[1]);
+        return strtotime($ical_date);
     }
     /**
      * Return unix date from iCal date format
@@ -275,24 +294,26 @@ class Structures_Ical
      */
     private function icalDtDate($key, $value)
     {
-        $value = $this->icalDateToUnix($value);
+        /*
+         $value = $this->icalDateToUnix($value);
 
-        // zjisteni TZID
-        $temp = explode(";",$key);
+         // zjisteni TZID
+         $temp = explode(";",$key);
 
-        $data = '';
+         $data = '';
 
-        if (empty($temp[1])) { // neni TZID
-            $data = str_replace('T', '', $data);
-            return array($key,$value);
-        }
-        // pridani $value a $tzid do pole
-        $key =     $temp[0];
-        $temp = explode("=", $temp[1]);
-        $return_value[$temp[0]] = $temp[1];
-        $return_value['unixtime'] = $value;
-
-        return array($key,$return_value);
+         if (empty($temp[1])) { // neni TZID
+         $data = str_replace('T', '', $data);
+         return array($key,$value);
+         }
+         // pridani $value a $tzid do pole
+         $key =     $temp[0];
+         $temp = explode("=", $temp[1]);
+         $return_value[$temp[0]] = $temp[1];
+         $return_value['unixtime'] = $value;
+         */
+        return array($key,strtotime($value));
+        //return array($key,$return_value);
     }
 
     /**
@@ -316,6 +337,7 @@ class Structures_Ical
      *
      * @param array $a
      * @param array $b
+     *
      * @return integer
      */
     private static function icalDtstartCompare($a, $b)
@@ -328,8 +350,18 @@ class Structures_Ical
      *
      * @return array
      */
-    function getEventList()
+    function getEvents()
     {
+        return $this->cal['VEVENT'];
+    }
+
+    function getSortedEvents()
+    {
+        $events = $this->getEvents(); //udfyldt med alle dine events
+        $sort = array();
+        foreach($events as $eid=>$event) { $sort[$eid] = $event['DTSTART']; }
+        array_multisort($events,SORT_ASC, SORT_NUMERIC,$sort);
+        $this->cal['VEVENT'] = $events;
         return $this->cal['VEVENT'];
     }
 
@@ -354,7 +386,7 @@ class Structures_Ical
     }
 
     /**
-     * Return base calendar data
+     * Return calender name
      *
      * @return array
      */
@@ -364,12 +396,31 @@ class Structures_Ical
     }
 
     /**
-     * Return array with all data
+     * Return all data
      *
      * @return array
      */
     function getAllData()
     {
         return $this->cal;
+    }
+
+    /**
+     * Gets an event
+     *
+     * @param string $event_identifier UID for the entry
+     *
+     * return array
+     */
+    function getEvent($event_identifier)
+    {
+        $events = $this->getEvents();
+        foreach ($events as $event) {
+            if ($event['UID'] == $event_identifier) {
+                return $event;
+                continue;
+            }
+        }
+        throw new Exception('Event not found');
     }
 }
