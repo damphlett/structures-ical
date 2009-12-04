@@ -143,10 +143,12 @@ class Structures_Ical
 
         // is this text vcalendar standard text ? on line 1 is BEGIN:VCALENDAR
         if (!stristr($this->file_text[0],'BEGIN:VCALENDAR')) {
-            return 'error not VCALENDAR';
+            throw new Exception('Content is not a VCALENDAR');
         }
 
         foreach ($this->file_text as $text) {
+            // @todo should net trim the lines as it will not work with the
+            //       descriptions
             $text = trim($text); // trim one line
             if (!empty($text)) {
                 // get Key and Value VCALENDAR:Begin -> Key = VCALENDAR, Value = begin
