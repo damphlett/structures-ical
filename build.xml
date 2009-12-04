@@ -4,7 +4,7 @@
     <taskdef classname="phing.tasks.ext.IlibPearDeployerTask" name="peardeploy" />
 
     <property name="package-name" value="${phing.project.name}" />
-    <property name="version" value="0.1.0" />
+    <property name="version" value="0.2.2" />
     <property name="stability" value="alpha" />
     <property name="pear.channel" value="public.intraface.dk" />
 
@@ -57,7 +57,7 @@
                 <package name="HTTP_Request" channel="pear.php.net" recommended_version="" minimum_version="1.4.4" />
             </dependencies>
             <notes>
-                * none
+                * Fixed getCalendarDescription
             </notes>
         </d51pearpkg2>
     </target>

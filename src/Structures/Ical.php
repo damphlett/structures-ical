@@ -19,6 +19,8 @@
  */
 class Structures_Ical
 {
+    protected $description;
+
     /**
      * Text in file
      *
@@ -98,7 +100,6 @@ class Structures_Ical
     {
         $this->file_text = $this->readFile($file);
         return $this->parse($file);
-
     }
 
     function getTimeZone()
@@ -140,8 +141,10 @@ class Structures_Ical
 
         $this->file_text = split("[\n]", $this->file_text);
 
-        // is this text vcalendar standart text ? on line 1 is BEGIN:VCALENDAR
-        if (!stristr($this->file_text[0],'BEGIN:VCALENDAR')) return 'error not VCALENDAR';
+        // is this text vcalendar standard text ? on line 1 is BEGIN:VCALENDAR
+        if (!stristr($this->file_text[0],'BEGIN:VCALENDAR')) {
+            return 'error not VCALENDAR';
+        }
 
         foreach ($this->file_text as $text) {
             $text = trim($text); // trim one line
@@ -159,24 +162,20 @@ class Structures_Ical
                         $this->event_count = $this->event_count+1; // new event begin
                         $type = "VEVENT";
                         break;
-
                     case "BEGIN:VCALENDAR": // all other special string
                     case "BEGIN:DAYLIGHT":
                     case "BEGIN:VTIMEZONE":
                     case "BEGIN:STANDARD":
-                        $type = $value; // save tu array under value key
+                        $type = $value; // save to array under value key
                         break;
-
                     case "END:VTODO": // end special text - goto VCALENDAR key
                     case "END:VEVENT":
-
                     case "END:VCALENDAR":
                     case "END:DAYLIGHT":
                     case "END:VTIMEZONE":
                     case "END:STANDARD":
                         $type = "VCALENDAR";
                         break;
-
                     default: // no special string
                         $this->addToArray($type, $key, $value); // add to array
                         break;
@@ -193,20 +192,27 @@ class Structures_Ical
      * @param string $type
      * @param string $key
      * @param string $value
+     *
+     * @return array
      */
     private function addToArray($type, $key, $value)
     {
         if ($key == false) {
             $key = $this->last_key;
             switch ($type) {
-                case 'VEVENT': $value = $this->cal[$type][$this->event_count][$key].$value;break;
-                case 'VTODO': $value = $this->cal[$type][$this->todo_count][$key].$value;break;
+                case 'VEVENT':
+                    $value = $this->cal[$type][$this->event_count][$key].$value;
+                    break;
+                case 'VTODO':
+                    $value = $this->cal[$type][$this->todo_count][$key].$value;
+                    break;
             }
         }
 
         if (($key == "DTSTAMP") or ($key == "LAST-MODIFIED") or ($key == "CREATED")) {
             $value = $this->icalDateToUnix($value);
         }
+
         if ($key == "RRULE") {
             $value = $this->icalRrule($value);
         }
@@ -214,6 +220,11 @@ class Structures_Ical
         if ($key == "LOCATION") {
             $value = $data = str_replace('\\,', ',', $value);
             $value = $data = str_replace('\\;', ';', $value);
+        }
+
+        if ($key == "X-WR-CALDESC") {
+            // how do we get this to store all the information
+            $this->description .= $value;
         }
 
         if ($key == "DESCRIPTION") {
@@ -245,8 +256,9 @@ class Structures_Ical
     /**
      * Parse text "XXXX:value text some with : " and return array($key = "XXXX", $value="value");
      *
-     * @param unknown_type $text
-     * @return unknown
+     * @param string $text
+     *
+     * @return array
      */
     private function returnKeyValue($text)
     {
@@ -258,13 +270,14 @@ class Structures_Ical
             $matches = array_splice($matches, 1, 2);
             return $matches;
         }
-
     }
+
     /**
      * Parse RRULE  return array
      *
      * @param unknown_type $value
-     * @return unknown
+     *
+     * @return array
      */
     private function icalRrule($value)
     {
@@ -275,6 +288,7 @@ class Structures_Ical
         }
         return $result;
     }
+
     /**
      * Return Unix time from ical date time fomrat (YYYYMMDD[T]HHMMSS[Z] or YYYYMMDD[T]HHMMSS)
      *
@@ -285,6 +299,7 @@ class Structures_Ical
     {
         return strtotime($ical_date);
     }
+
     /**
      * Return unix date from iCal date format
      *
@@ -316,21 +331,6 @@ class Structures_Ical
         //return array($key,$return_value);
     }
 
-    /**
-     * Return sorted eventlist as array or false if calenar is empty
-     *
-     * @return unknown
-     */
-    function getSortEventList()
-    {
-        $temp = $this->getEventList();
-        if (!empty($temp)) {
-            usort($temp, array($this, "icalDtstartCompare"));
-            return    $temp;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * Compare two unix timestamp
@@ -355,6 +355,11 @@ class Structures_Ical
         return $this->cal['VEVENT'];
     }
 
+    /**
+     * @see getSortEventList()
+     *
+     * Which is better?
+     */
     function getSortedEvents()
     {
         $events = $this->getEvents(); //udfyldt med alle dine events
@@ -363,6 +368,24 @@ class Structures_Ical
         array_multisort($events,SORT_ASC, SORT_NUMERIC,$sort);
         $this->cal['VEVENT'] = $events;
         return $this->cal['VEVENT'];
+    }
+
+    /**
+     * Return sorted eventlist as array or false if calenar is empty
+     *
+     * @deprecated
+     *
+     * @return unknown
+     */
+    function getSortEventList()
+    {
+        $temp = $this->getEventList();
+        if (!empty($temp)) {
+            usort($temp, array($this, "icalDtstartCompare"));
+            return    $temp;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -380,7 +403,7 @@ class Structures_Ical
      *
      * @return array
      */
-    function getCalenderData()
+    function getCalendarData()
     {
         return $this->cal['VCALENDAR'];
     }
@@ -393,6 +416,15 @@ class Structures_Ical
     function getCalendarName()
     {
         return $this->cal['VCALENDAR']['X-WR-CALNAME'];
+    }
+
+    function getCalendarDescription()
+    {
+        $this->description = $data = str_replace('\\,', ',', $this->description);
+        $this->description = $data = str_replace('\\;', ';', $this->description);
+        $this->description = $data = str_replace('\\n', "\n", $this->description);
+
+        return $this->description;
     }
 
     /**
