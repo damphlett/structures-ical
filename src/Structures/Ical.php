@@ -1,7 +1,6 @@
 <?php
 /**
- * This class Parse iCal standard. Is prepare to iCal feature version.
- * Now is testing with apple iCal standard 2.0.
+ * Parses ICALENDER-format files
  *
  * PHP Version 5
  *
@@ -12,10 +11,7 @@
  * </code>
  *
  * @package Structures_ICal
- * @author  Roman Ožana (Cz)
- * @copyright Roman Ožana (Cz)
- * @link www.nabito.net
- * @version 1.0
+ * @author  Lars Olesen
  */
 class Structures_Ical
 {
@@ -163,12 +159,12 @@ class Structures_Ical
 
                 switch ($text) { // search special string
                     case "BEGIN:VTODO":
-                        $this->todo_count = $this->todo_count+1; // new todo begin
+                        $this->todo_count = $this->todo_count + 1; // new todo begin
                         $type = "VTODO";
                         break;
 
                     case "BEGIN:VEVENT":
-                        $this->event_count = $this->event_count+1; // new event begin
+                        $this->event_count = $this->event_count + 1; // new event begin
                         $type = "VEVENT";
                         break;
                     case "BEGIN:VCALENDAR": // all other special string
@@ -238,6 +234,11 @@ class Structures_Ical
             $this->description .= $value;
         }
 
+        if ($key == 'SUMMARY') {
+            $value = $data = str_replace('\\,', ',', $value);
+            $value = $data = str_replace('\\;', ';', $value);
+        }
+
         if ($key == "DESCRIPTION") {
             $value = $data = str_replace('\\,', ',', $value);
             $value = $data = str_replace('\\;', ';', $value);
@@ -247,6 +248,7 @@ class Structures_Ical
         if (stristr($key,"DTSTART") or stristr($key,"DTEND")) {
             list($key,$value) = $this->icalDtDate($key,$value);
         }
+
 
         switch ($type) {
             case "VTODO":
@@ -276,11 +278,11 @@ class Structures_Ical
         preg_match("/([^:]+)[:]([\w\W]+)/", $text, $matches);
 
         if (empty($matches)) {
-            return array(false,$text);
-        } else  {
-            $matches = array_splice($matches, 1, 2);
-            return $matches;
+            return array(false, $text);
         }
+
+        $matches = array_splice($matches, 1, 2);
+        return $matches;
     }
 
     /**
@@ -301,10 +303,12 @@ class Structures_Ical
     }
 
     /**
-     * Return Unix time from ical date time fomrat (YYYYMMDD[T]HHMMSS[Z] or YYYYMMDD[T]HHMMSS)
+     * Returns unix time from ical date time format
      *
-     * @param unknown_type $ical_date
-     * @return unknown
+     * @deprecated - is this needed?
+     * @param date $ical_date Format YYYYMMDD[T]HHMMSS[Z] or YYYYMMDD[T]HHMMSS
+     *
+     * @return integer
      */
     private function icalDateToUnix($ical_date)
     {
@@ -312,10 +316,11 @@ class Structures_Ical
     }
 
     /**
-     * Return unix date from iCal date format
+     * Return unix date from iCal date format in an array
      *
      * @param string $key
-     * @param string $value
+     * @param string $value Format YYYYMMDD[T]HHMMSS[Z] or YYYYMMDD[T]HHMMSS
+     *
      * @return array
      */
     private function icalDtDate($key, $value)
@@ -338,7 +343,7 @@ class Structures_Ical
          $return_value[$temp[0]] = $temp[1];
          $return_value['unixtime'] = $value;
          */
-        return array($key,strtotime($value));
+        return array($key, strtotime($value));
         //return array($key,$return_value);
     }
 
@@ -375,8 +380,10 @@ class Structures_Ical
     {
         $events = $this->getEvents(); //udfyldt med alle dine events
         $sort = array();
-        foreach($events as $eid=>$event) { $sort[$eid] = $event['DTSTART']; }
-        array_multisort($events,SORT_ASC, SORT_NUMERIC,$sort);
+        foreach($events as $eid => $event) {
+            $sort[$eid] = $event['DTSTART'];
+        }
+        array_multisort($events, SORT_ASC, SORT_NUMERIC, $sort);
         $this->cal['VEVENT'] = $events;
         return $this->cal['VEVENT'];
     }
@@ -390,7 +397,7 @@ class Structures_Ical
      */
     function getSortEventList()
     {
-        $temp = $this->getEventList();
+        $temp = $this->getEvents();
         if (!empty($temp)) {
             usort($temp, array($this, "icalDtstartCompare"));
             return    $temp;
