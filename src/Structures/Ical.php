@@ -20,6 +20,7 @@
 class Structures_Ical
 {
     protected $description;
+    protected $uid;
 
     /**
      * Text in file
@@ -27,29 +28,34 @@ class Structures_Ical
      * @var string
      */
     private $file_text;
+
     /**
      * This array save iCalendar parse data
      *
      * @var array
      */
     private $cal;
+
     /**
      * Number of Events
      *
      * @var integer
      */
     private $event_count;
+
     /**
      * Number of ToDos
      *
      * @var unknown_type
      */
     private $todo_count;
+
     /**
      * Help variable save last key (multiline string)
      *
      * @var unknown_type
      */
+
     private $last_key;
     /**
      * Read text file, icalender text file
@@ -147,9 +153,10 @@ class Structures_Ical
         }
 
         foreach ($this->file_text as $text) {
-            // @todo should net trim the lines as it will not work with the
+            // @todo should not trim the lines as it will not work with the
             //       descriptions
             $text = trim($text); // trim one line
+
             if (!empty($text)) {
                 // get Key and Value VCALENDAR:Begin -> Key = VCALENDAR, Value = begin
                 list($key, $value) = $this->returnKeyValue($text);
@@ -204,6 +211,8 @@ class Structures_Ical
             switch ($type) {
                 case 'VEVENT':
                     $value = $this->cal[$type][$this->event_count][$key].$value;
+                    // HACK - don't know how else to handle this - added by google?
+                    $value = str_replace('ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;X-NUM-GUE', '', $value);
                     break;
                 case 'VTODO':
                     $value = $this->cal[$type][$this->todo_count][$key].$value;

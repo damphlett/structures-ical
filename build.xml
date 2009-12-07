@@ -4,7 +4,7 @@
     <taskdef classname="phing.tasks.ext.IlibPearDeployerTask" name="peardeploy" />
 
     <property name="package-name" value="${phing.project.name}" />
-    <property name="version" value="0.2.2" />
+    <property name="version" value="0.2.3" />
     <property name="stability" value="alpha" />
     <property name="pear.channel" value="public.intraface.dk" />
 
@@ -57,7 +57,7 @@
                 <package name="HTTP_Request" channel="pear.php.net" recommended_version="" minimum_version="1.4.4" />
             </dependencies>
             <notes>
-                * Fixed getCalendarDescription
+                * Fixed issue with ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;X-NUM-GUE. Just a temporary hack, needs to find better parsing
             </notes>
         </d51pearpkg2>
     </target>
