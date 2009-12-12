@@ -159,12 +159,12 @@ class Structures_Ical
 
                 switch ($text) { // search special string
                     case "BEGIN:VTODO":
-                        $this->todo_count = $this->todo_count + 1; // new todo begin
+                        $this->todo_count = $this->todo_count+1; // new todo begin
                         $type = "VTODO";
                         break;
 
                     case "BEGIN:VEVENT":
-                        $this->event_count = $this->event_count + 1; // new event begin
+                        $this->event_count = $this->event_count+1; // new event begin
                         $type = "VEVENT";
                         break;
                     case "BEGIN:VCALENDAR": // all other special string
@@ -234,11 +234,6 @@ class Structures_Ical
             $this->description .= $value;
         }
 
-        if ($key == 'SUMMARY') {
-            $value = $data = str_replace('\\,', ',', $value);
-            $value = $data = str_replace('\\;', ';', $value);
-        }
-
         if ($key == "DESCRIPTION") {
             $value = $data = str_replace('\\,', ',', $value);
             $value = $data = str_replace('\\;', ';', $value);
@@ -246,9 +241,9 @@ class Structures_Ical
         }
 
         if (stristr($key,"DTSTART") or stristr($key,"DTEND")) {
+            $key = str_replace(';VALUE=DATE', '', $key);
             list($key,$value) = $this->icalDtDate($key,$value);
         }
-
 
         switch ($type) {
             case "VTODO":
@@ -278,11 +273,11 @@ class Structures_Ical
         preg_match("/([^:]+)[:]([\w\W]+)/", $text, $matches);
 
         if (empty($matches)) {
-            return array(false, $text);
+            return array(false,$text);
+        } else  {
+            $matches = array_splice($matches, 1, 2);
+            return $matches;
         }
-
-        $matches = array_splice($matches, 1, 2);
-        return $matches;
     }
 
     /**
@@ -303,12 +298,10 @@ class Structures_Ical
     }
 
     /**
-     * Returns unix time from ical date time format
+     * Return Unix time from ical date time fomrat (YYYYMMDD[T]HHMMSS[Z] or YYYYMMDD[T]HHMMSS)
      *
-     * @deprecated - is this needed?
-     * @param date $ical_date Format YYYYMMDD[T]HHMMSS[Z] or YYYYMMDD[T]HHMMSS
-     *
-     * @return integer
+     * @param unknown_type $ical_date
+     * @return unknown
      */
     private function icalDateToUnix($ical_date)
     {
@@ -316,11 +309,10 @@ class Structures_Ical
     }
 
     /**
-     * Return unix date from iCal date format in an array
+     * Return unix date from iCal date format
      *
      * @param string $key
-     * @param string $value Format YYYYMMDD[T]HHMMSS[Z] or YYYYMMDD[T]HHMMSS
-     *
+     * @param string $value
      * @return array
      */
     private function icalDtDate($key, $value)
@@ -343,7 +335,7 @@ class Structures_Ical
          $return_value[$temp[0]] = $temp[1];
          $return_value['unixtime'] = $value;
          */
-        return array($key, strtotime($value));
+        return array($key,strtotime($value));
         //return array($key,$return_value);
     }
 
@@ -380,7 +372,7 @@ class Structures_Ical
     {
         $events = $this->getEvents(); //udfyldt med alle dine events
         $sort = array();
-        foreach($events as $eid => $event) {
+        foreach ($events as $eid => $event) {
             $sort[$eid] = $event['DTSTART'];
         }
         array_multisort($events, SORT_ASC, SORT_NUMERIC, $sort);
@@ -473,4 +465,30 @@ class Structures_Ical
         }
         throw new Exception('Event not found');
     }
+
+    function test($ical)
+    {
+        preg_match_all('/(BEGIN:VEVENT.*?END:VEVENT)/si', $ical, $result, PREG_PATTERN_ORDER);
+        for ($i = 0; $i < count($result[0]); $i++) {
+            $tmpbyline = explode("\r\n", $result[0][$i]);
+
+            foreach ($tmpbyline as $item) {
+                $tmpholderarray = explode(":",$item);
+                if (count($tmpholderarray) >1) {
+                    $majorarray[$tmpholderarray[0]] = $tmpholderarray[1];
+                }
+
+            }
+            /*
+                lets just finish what we started..
+            */
+            if (preg_match('/DESCRIPTION:(.*)END:VEVENT/si', $result[0][$i], $regs)) {
+                $majorarray['DESCRIPTION'] = str_replace("  ", " ", str_replace("\r\n", "", $regs[1]));
+            }
+            $icalarray[] = $majorarray;
+            unset($majorarray);
+        }
+        return $icalarray;
+    }
+
 }
