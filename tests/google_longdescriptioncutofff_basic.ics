@@ -1,0 +1,45 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Vejle Idrætshøjskoles åbne foredrag
+X-WR-TIMEZONE:Europe/Copenhagen
+X-WR-CALDESC:Vejle Idrætshøjskole tilbyder en række foredrag\, som du herme
+ d inviteres til. Under det enkelte foredrag kan du se\, hvor det afholdes\,
+  hvornår det er og hvad det koster. Det kan være en god ide at bestille bil
+ letter før arrangementet. Billetter sælges dog også ved indgangen. Hvis  du
+  har spørgsmål til foredragsrækken\, kan du skrive til lars@vih.dk eller ri
+ nge på 7582 0811.\n\nVi samarbejder med Vejle Bibliotek og Folkeuniversitet
+  Vejle.
+BEGIN:VEVENT
+DTSTART:20100209T173000Z
+DTEND:20100209T203000Z
+DTSTAMP:20091212T120307Z
+UID:mcp02ogprf9kvd2qvk91o4fbeg@google.com
+CREATED:20091202T202326Z
+DESCRIPTION:Dette foredrag er i udgangspunktet kun for Vejle Idrætshøjskole
+ s elever. Hvis du er meget interesseret i at deltage\, kan du kontakte lars
+ @vih.dk for yderligere oplysninger.\n\nTuren går til Århus til et dobbeltar
+ rangement. Først et foredrag og derefter en forestilling.\n\n1) 18:30 Fored
+ rag med præst Lars Tjalve: Døden og det evige liv.\n\nSlut\, færdig og ned 
+ i et hul i jorden. Sådan er det ikke siger den kristne\ntro.. Når Gud er ti
+ l\, får døden ikke det sidste ord. Derfor er det muligt at\nmøde døden med 
+ håb\, og derfor er det også muligt at tackle andres død uden\nat fortvivle 
+ - selv om det er surt at skulle se sin egen og andres\ndødelighed i øjnene.
+ \n\n2) 19:30 Forestillingen SNIP SNAP SNUDE - En poetisk og sanselig dans m
+ ed døden.\n\nDøden er forunderlig\, fascinerende\, mystisk og tabubelagt - 
+ en uomtvistelig del af livet. Døden kan man regne med.\n\nI et rent sansebo
+ mbardement\, hvor det individuelle syn på døden flettes med forskellige kul
+ turelle opfattelser af afslutningen på livet\, tager dadadans døden under b
+ ehandling. Det er danserens levende krop i leg med visuelle virtuelle eleme
+ nter og døden som den evige dansepartner. SNIP SNAP SNUDE sætter perspektiv
+  på vores opfattelse af døden - din\, min og naboens!
+LAST-MODIFIED:20091211T103951Z
+LOCATION:Archauz\, Valdemarsgade 1\, 8000 Århus C
+SEQUENCE:2
+STATUS:CONFIRMED
+SUMMARY:Forestillingen SNIP SNAP SNUDE
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

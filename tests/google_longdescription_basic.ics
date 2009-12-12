@@ -1,0 +1,41 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Vejle Idrætshøjskoles åbne foredrag
+X-WR-TIMEZONE:Europe/Copenhagen
+X-WR-CALDESC:Vejle Idrætshøjskole tilbyder en række foredrag\, som du herme
+ d inviteres til. Under det enkelte foredrag kan du se\, hvor det afholdes\,
+  hvornår det er og hvad det koster. Det kan være en god ide at bestille bil
+ letter før arrangementet. Billetter sælges dog også ved indgangen. Hvis  du
+  har spørgsmål til foredragsrækken\, kan du skrive til lars@vih.dk eller ri
+ nge på 7582 0811.\n\nVi samarbejder med Vejle Bibliotek og Folkeuniversitet
+  Vejle.
+BEGIN:VEVENT
+DTSTART:20100420T170000Z
+DTEND:20100420T183000Z
+DTSTAMP:20091212T115007Z
+UID:cvgve4knm7r4tb4hlciocfc9tg@google.com
+CREATED:20091202T202554Z
+DESCRIPTION:Et af Danmarks største rap-navne\, Per Vers kommer forbi og hol
+ der et foredrag om\, hvad det vil sige at være rapper. Publikum får en forn
+ emmelse af det potente poetiske potentiale der gemmer sig bag hængerøven og
+  håndtegnene.\n\nFordomme og dagdrømme bliver taget op – hvordan gør man\, 
+ og især hvorfor? Per Vers bliver stadig inspireret af den originale hiphop-
+ kultur\, der fødtes i sluthalvfjerdsernes Bronx\, og fortæller om dens opri
+ ndelse\, idealer og historie – for det er en god historie!\n\nPer Vers komb
+ inerer sit foredrag med intense og intime smagsprøver på sin kunst i praksi
+ s\, i små passager jævnt fordelt udover sit foredrag\, så cirka en tredjede
+ l af tiden bliver musikalsk. Her får man lov til at læne sig tilbage og lev
+ e sig ind i de fede rim og sjove tekster - og komme frem i sædet igen\, når
+  det er Danmarks ubetinget bedste freestyle-rap\, hvor DU for lov til at be
+ stemme hvad der skal spyttes i mikrofonen...!
+LAST-MODIFIED:20091212T081014Z
+LOCATION:Globen\, Vejle Idrætshøjskole
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Per Vers: Et funky foredrag
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

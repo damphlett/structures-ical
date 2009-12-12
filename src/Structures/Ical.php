@@ -234,6 +234,11 @@ class Structures_Ical
             $this->description .= $value;
         }
 
+        if ($key == "SUMMARY") {
+            $value = $data = str_replace('\\,', ',', $value);
+            $value = $data = str_replace('\\;', ';', $value);
+        }
+
         if ($key == "DESCRIPTION") {
             $value = $data = str_replace('\\,', ',', $value);
             $value = $data = str_replace('\\;', ';', $value);
@@ -466,6 +471,9 @@ class Structures_Ical
         throw new Exception('Event not found');
     }
 
+    /**
+     * Another possible way to parse. However does not contain all the possiblity
+     */
     function test($ical)
     {
         preg_match_all('/(BEGIN:VEVENT.*?END:VEVENT)/si', $ical, $result, PREG_PATTERN_ORDER);
@@ -477,11 +485,8 @@ class Structures_Ical
                 if (count($tmpholderarray) >1) {
                     $majorarray[$tmpholderarray[0]] = $tmpholderarray[1];
                 }
-
             }
-            /*
-                lets just finish what we started..
-            */
+            // lets just finish what we started..
             if (preg_match('/DESCRIPTION:(.*)END:VEVENT/si', $result[0][$i], $regs)) {
                 $majorarray['DESCRIPTION'] = str_replace("  ", " ", str_replace("\r\n", "", $regs[1]));
             }
